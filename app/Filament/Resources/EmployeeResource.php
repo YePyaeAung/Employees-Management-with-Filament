@@ -27,7 +27,7 @@ class EmployeeResource extends Resource
 {
     protected static ?string $model = Employee::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-briefcase';
 
     public static function form(Form $form): Form
     {
@@ -36,21 +36,26 @@ class EmployeeResource extends Resource
                 Card::make()
                     ->schema([
                         TextInput::make('first_name')
-                            ->required(),
+                            ->required()
+                            ->maxLength(255),
                         TextInput::make('last_name')
-                            ->required(),
+                            ->required()
+                            ->maxLength(255),
                         Textarea::make('address')->rows(2)
-                            ->required(),
+                            ->required()
+                            ->maxLength(1000),
                         Select::make('department_id')
                             ->relationship('department', 'name')
                             ->required(),
                         Select::make('country_id')
                             ->label('Country')
+                            ->required()
                             ->options(Country::all()->pluck('name', 'id')->toArray())
                             ->reactive()
                             ->afterStateUpdated(fn (callable  $set) => $set('state_id', null)),
                         Select::make('state_id')
                             ->label('State')
+                            ->required()
                             ->options(function (callable $get) {
                                 $country = Country::find($get('country_id'));
                                 if (!$country) {
@@ -62,6 +67,7 @@ class EmployeeResource extends Resource
                             ->afterStateUpdated(fn (callable  $set) => $set('city_id', null)),
                         Select::make('city_id')
                             ->label('City')
+                            ->required()
                             ->options(function (callable $get) {
                                 $state = State::find($get('state_id'));
                                 if (!$state) {
@@ -71,7 +77,8 @@ class EmployeeResource extends Resource
                             })
                             ->reactive(),
                         TextInput::make('zip_code')
-                            ->required(),
+                            ->required()
+                            ->maxLength(6),
                         DatePicker::make('birth_date')
                             ->required(),
                         DatePicker::make('date_hired')
